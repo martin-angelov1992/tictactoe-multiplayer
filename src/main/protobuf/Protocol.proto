@@ -1,0 +1,48 @@
+package martin.tictactoe_multiplayer;
+
+option java_outer_classname = "Commands";
+
+message BaseCommand {
+        extensions 100 to max;
+
+        enum CommandType {
+                START_GAME_REQUEST = 1;
+                MOVE   = 2;
+                TIMES_UP = 3;
+        }
+        required CommandType type = 1;
+}
+
+// sent by player wanting to start new game
+message StartNewGame {
+        extend BaseCommand {
+                required StartNewGame cmd = 100;
+        }
+
+        required bool imFirst = 1; // indicating wether the player starting the new game wants to be first
+}
+
+// sent in response of StartNewGame 
+message StartNewGameResponse {
+        extend BaseCommand {
+                required StartNewGame cmd = 101;
+        }
+
+		required bool letsStart = 1; // indicating wether the player has accepted the proposal to start the game
+}
+
+// sent by player when he makes a move
+message Move {
+        extend BaseCommand {
+                required Move cmd = 102;
+        }
+        required int32 x = 1;
+        required int32 y = 2;
+}
+
+// sent by player1 waiting for player2 to make a move, when player2 time is up
+message TimesUp {
+        extend BaseCommand {
+                required TimesUp cmd = 103;
+        }
+}
