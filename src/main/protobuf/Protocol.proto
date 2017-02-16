@@ -9,6 +9,7 @@ message BaseCommand {
                 START_GAME_REQUEST = 1;
                 MOVE   = 2;
                 TIMES_UP = 3;
+                START_NEW_GAME_RESPONSE = 4;
         }
         required CommandType type = 1;
 }
@@ -25,7 +26,7 @@ message StartNewGame {
 // sent in response of StartNewGame 
 message StartNewGameResponse {
         extend BaseCommand {
-                required StartNewGame cmd = 101;
+                required StartNewGameResponse cmd = 101;
         }
 
 		required bool letsStart = 1; // indicating wether the player has accepted the proposal to start the game

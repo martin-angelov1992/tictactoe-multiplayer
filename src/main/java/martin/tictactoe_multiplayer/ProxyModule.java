@@ -4,6 +4,8 @@ import javax.inject.Singleton;
 
 import com.google.inject.AbstractModule;
 
+import martin.tictactoe_multiplayer.communication.Communication;
+
 public class ProxyModule extends AbstractModule {
 	@Override
 	protected void configure() {
