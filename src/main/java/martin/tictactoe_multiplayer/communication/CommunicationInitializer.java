@@ -21,7 +21,7 @@ public class CommunicationInitializer  extends ChannelInitializer<SocketChannel>
     p.addLast(new ProtobufVarint32LengthFieldPrepender());
     p.addLast(new ProtobufEncoder());
 
-    p.addLast(new CommunicationClientHandler());
+    p.addLast(new CommunicationHandler());
     
   }
   

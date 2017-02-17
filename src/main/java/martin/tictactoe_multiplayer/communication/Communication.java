@@ -3,9 +3,14 @@ package martin.tictactoe_multiplayer.communication;
 import com.google.protobuf.GeneratedMessage.GeneratedExtension;
 
 import io.netty.bootstrap.Bootstrap;
+import io.netty.bootstrap.ServerBootstrap;
+import io.netty.channel.Channel;
 import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
+import io.netty.channel.socket.nio.NioServerSocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
+import io.netty.handler.logging.LogLevel;
+import io.netty.handler.logging.LoggingHandler;
 import martin.tictactoe_multiplayer.Commands;
 import martin.tictactoe_multiplayer.Commands.BaseCommand;
 import martin.tictactoe_multiplayer.Commands.Move;
@@ -14,20 +19,43 @@ import martin.tictactoe_multiplayer.Commands.StartNewGameResponse;
 import martin.tictactoe_multiplayer.Commands.TimesUp;
 
 public class Communication {
+	private Channel channel;
+
+	void setChannel(Channel channel) {
+		this.channel = channel;
+	}
+
+	public void awaitConnection(int port) {
+		EventLoopGroup serverGroup = new NioEventLoopGroup(1);
+		EventLoopGroup workerGroup = new NioEventLoopGroup();
+
+		ServerBootstrap bootStrap = new ServerBootstrap();
+		bootStrap.group(serverGroup, workerGroup).channel(NioServerSocketChannel.class)
+				.handler(new LoggingHandler(LogLevel.INFO)).childHandler(new CommunicationInitializer());
+
+		// Bind to port
+		try {
+			bootStrap.bind(port).sync().channel().closeFuture().sync();
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		} finally {
+			serverGroup.shutdownGracefully();
+			workerGroup.shutdownGracefully();
+		}
+	}
+
 	public void connect(String host, int port) {
 		EventLoopGroup group = new NioEventLoopGroup();
 
-	    try {
-	        Bootstrap bootstrap = new Bootstrap();
-	        bootstrap.group(group)
-	                 .channel(NioSocketChannel.class)
-	                 .handler(new CommunicationInitializer());
-	        
-	        // Create connection 
-	        bootstrap.connect(host, port);
-	      } finally {
-	        group.shutdownGracefully();
-	      }
+		try {
+			Bootstrap bootstrap = new Bootstrap();
+			bootstrap.group(group).channel(NioSocketChannel.class).handler(new CommunicationInitializer());
+
+			// Create connection
+			bootstrap.connect(host, port);
+		} finally {
+			group.shutdownGracefully();
+		}
 	}
 
 	public void sendTimesUp() {
@@ -50,7 +78,9 @@ public class Communication {
 		sendMessage(BaseCommand.CommandType.START_NEW_GAME_RESPONSE, Commands.StartNewGameResponse.cmd, message);
 	}
 
-	private <Type> void sendMessage(BaseCommand.CommandType type, GeneratedExtension<BaseCommand, Type> extension, Type cmd) {
+	private <Type> void sendMessage(BaseCommand.CommandType type, GeneratedExtension<BaseCommand, Type> extension,
+			Type cmd) {
 		BaseCommand wrapper = BaseCommand.newBuilder().setType(type).setExtension(extension, cmd).build();
+		channel.writeAndFlush(wrapper);
 	}
 }
