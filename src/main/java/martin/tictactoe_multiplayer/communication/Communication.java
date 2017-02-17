@@ -31,7 +31,7 @@ public class Communication {
 
 		ServerBootstrap bootStrap = new ServerBootstrap();
 		bootStrap.group(serverGroup, workerGroup).channel(NioServerSocketChannel.class)
-				.handler(new LoggingHandler(LogLevel.INFO)).childHandler(new CommunicationInitializer());
+				.handler(new LoggingHandler(LogLevel.INFO)).childHandler(new CommunicationInitializer(this));
 
 		// Bind to port
 		try {
@@ -49,10 +49,13 @@ public class Communication {
 
 		try {
 			Bootstrap bootstrap = new Bootstrap();
-			bootstrap.group(group).channel(NioSocketChannel.class).handler(new CommunicationInitializer());
+			bootstrap.group(group).channel(NioSocketChannel.class).handler(new CommunicationInitializer(this));
 
 			// Create connection
-			bootstrap.connect(host, port);
+			channel = bootstrap.connect(host, port).sync().channel();
+			sendTimesUp();
+		} catch (InterruptedException e) {
+			e.printStackTrace();
 		} finally {
 			group.shutdownGracefully();
 		}
@@ -70,7 +73,9 @@ public class Communication {
 
 	public void sendMove(byte x, byte y) {
 		Move message = Move.newBuilder().setX(x).setY(y).build();
+		System.out.println("Sending move.");
 		sendMessage(BaseCommand.CommandType.MOVE, Commands.Move.cmd, message);
+		System.out.println("Sent move.");
 	}
 
 	public void sendStartNewGameResponse(boolean agree) {
@@ -81,6 +86,11 @@ public class Communication {
 	private <Type> void sendMessage(BaseCommand.CommandType type, GeneratedExtension<BaseCommand, Type> extension,
 			Type cmd) {
 		BaseCommand wrapper = BaseCommand.newBuilder().setType(type).setExtension(extension, cmd).build();
-		channel.writeAndFlush(wrapper);
+		try {
+			channel.writeAndFlush(wrapper).sync();
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 }

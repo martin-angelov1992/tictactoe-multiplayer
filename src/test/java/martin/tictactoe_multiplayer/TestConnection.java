@@ -10,16 +10,20 @@ public class TestConnection extends TestCase {
 
 	@Test
 	public void test() throws InterruptedException {
-		Communication con = new Communication();
-		CommunicationHandler.communication = con;
+		Communication client = new Communication();
+		Communication server = new Communication();
 		Runnable r = () -> {
-			con.awaitConnection(4000);
+			server.awaitConnection(4000);
+			try {
+				Thread.sleep(5000);
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		};
 		new Thread(r).start();
-		Thread.sleep(1000);
-		con.connect("localhost", 4000);
-		Thread.sleep(1000);
-		con.sendMove((byte)1, (byte)1);
-		Thread.sleep(1000);
+		client.connect("localhost", 4000);
+		client.sendMove((byte)1, (byte)1);
+		Thread.sleep(5000);
 	}
 }

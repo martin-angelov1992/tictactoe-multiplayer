@@ -9,7 +9,13 @@ import io.netty.handler.codec.protobuf.ProtobufVarint32FrameDecoder;
 import io.netty.handler.codec.protobuf.ProtobufVarint32LengthFieldPrepender;
 import martin.tictactoe_multiplayer.Commands;
 
-public class CommunicationInitializer  extends ChannelInitializer<SocketChannel> {
+public class CommunicationInitializer extends ChannelInitializer<SocketChannel> {
+
+	private Communication communication;
+
+	public CommunicationInitializer(Communication communication) {
+		this.communication = communication;
+	}
 
   @Override
   protected void initChannel(SocketChannel ch) throws Exception {
@@ -21,7 +27,7 @@ public class CommunicationInitializer  extends ChannelInitializer<SocketChannel>
     p.addLast(new ProtobufVarint32LengthFieldPrepender());
     p.addLast(new ProtobufEncoder());
 
-    p.addLast(new CommunicationHandler());
+    p.addLast(new CommunicationHandler(communication));
     
   }
   

@@ -9,11 +9,17 @@ import martin.tictactoe_multiplayer.Commands.BaseCommand;
 public class CommunicationHandler extends SimpleChannelInboundHandler<BaseCommand> {
 
 	@Inject
-	public static Communication communication;
+	private Communication communication;
+
+	public CommunicationHandler(Communication communication) {
+		this.communication = communication;
+	}
 
 	@Override
 	protected void channelRead0(ChannelHandlerContext ctx, BaseCommand msg) throws Exception {
 		System.out.println("Message received");
+		communication.setChannel(ctx.channel());
+		communication.sendMove((byte)1, (byte)1);
 		switch (msg.getType()) {
 		case MOVE:
 			// msg.getExtension(extension);
@@ -37,6 +43,13 @@ public class CommunicationHandler extends SimpleChannelInboundHandler<BaseComman
 
 	@Override
 	public void channelRegistered(ChannelHandlerContext ctx) throws Exception {
+		System.out.println("Channel Registered");
+
+	}
+
+	@Override
+	public void channelActive(ChannelHandlerContext ctx) throws Exception {
 		communication.setChannel(ctx.channel());
+		System.out.println("Channel Active");
 	}
 }
