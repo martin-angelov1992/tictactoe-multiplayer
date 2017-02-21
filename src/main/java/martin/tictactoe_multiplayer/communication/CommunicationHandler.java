@@ -4,7 +4,9 @@ import javax.inject.Inject;
 
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
+import martin.tictactoe_multiplayer.Commands;
 import martin.tictactoe_multiplayer.Commands.BaseCommand;
+import martin.tictactoe_multiplayer.Commands.Move;
 
 public class CommunicationHandler extends SimpleChannelInboundHandler<BaseCommand> {
 
@@ -17,12 +19,10 @@ public class CommunicationHandler extends SimpleChannelInboundHandler<BaseComman
 
 	@Override
 	protected void channelRead0(ChannelHandlerContext ctx, BaseCommand msg) throws Exception {
-		System.out.println("Message received");
-		communication.setChannel(ctx.channel());
-		communication.sendMove((byte)1, (byte)1);
 		switch (msg.getType()) {
 		case MOVE:
-			// msg.getExtension(extension);
+			Move cmd = msg.getExtension(Commands.Move.cmd);
+			System.out.println(cmd.getX() + " " + cmd.getY());
 			break;
 		case START_GAME_REQUEST:
 			break;

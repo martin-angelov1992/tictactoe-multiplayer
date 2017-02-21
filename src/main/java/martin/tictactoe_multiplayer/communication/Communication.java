@@ -38,9 +38,6 @@ public class Communication {
 			bootStrap.bind(port).sync().channel().closeFuture().sync();
 		} catch (InterruptedException e) {
 			e.printStackTrace();
-		} finally {
-			serverGroup.shutdownGracefully();
-			workerGroup.shutdownGracefully();
 		}
 	}
 
@@ -56,8 +53,6 @@ public class Communication {
 			sendTimesUp();
 		} catch (InterruptedException e) {
 			e.printStackTrace();
-		} finally {
-			group.shutdownGracefully();
 		}
 	}
 
@@ -73,9 +68,7 @@ public class Communication {
 
 	public void sendMove(byte x, byte y) {
 		Move message = Move.newBuilder().setX(x).setY(y).build();
-		System.out.println("Sending move.");
 		sendMessage(BaseCommand.CommandType.MOVE, Commands.Move.cmd, message);
-		System.out.println("Sent move.");
 	}
 
 	public void sendStartNewGameResponse(boolean agree) {
