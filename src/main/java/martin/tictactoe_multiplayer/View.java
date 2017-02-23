@@ -5,9 +5,9 @@ import java.awt.EventQueue;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import java.awt.GridLayout;
-import java.util.HashSet;
 import java.util.Set;
 
+import javax.inject.Inject;
 import javax.swing.GroupLayout;
 import javax.swing.GroupLayout.Alignment;
 import javax.swing.LayoutStyle.ComponentPlacement;
@@ -15,6 +15,7 @@ import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.border.LineBorder;
+
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.event.ActionListener;
@@ -22,23 +23,18 @@ import java.awt.event.ActionEvent;
 
 public class View {
 
+	@Inject
+	private Game game;
+
 	private JFrame frame;
 
 	private JLabel whosTurn;
 	private JLabel timeInfo;
 
-	private Timer timer;
-
-	private static Set<Runnable> invalidThreads;
-
-	private static Runnable currentThinker;
-	//private static final int BOX_SIZE = 70;
-
 	/**
 	 * Launch the application.
 	 */
 	public static void main(String[] args) {
-		invalidThreads = new HashSet<>();
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
 				try {
@@ -173,7 +169,7 @@ public class View {
 	}
 
 	public void startNewGame() {
-		Object[] options = {"Me","The Bot", "Cancel"};
+		Object[] options = {"Me","Other Player", "Cancel"};
 
 		int option = JOptionPane.showOptionDialog(null, 
 				"Who do you want to go first?", 
@@ -186,45 +182,18 @@ public class View {
 
 		switch (option) {
 		case 0:
-			Board.startNewGame(false);
+			game.startNewGame(false);
 			clearBoard();
 			setMyTurn();
-			startOrResetTimer(false);
-			invalidThreads.add(currentThinker);
-			currentThinker = null;
 			break;
 		case 1:
-			Board.startNewGame(true);
+			game.startNewGame(true);
 			clearBoard();
 			setOtherPlayerTurn();
-			startOrResetTimer(true);
-			makeOtherPlayerMove();		
-			invalidThreads.add(currentThinker);
-			currentThinker = null;
 			break;
 		default:
 			return;
 		}
-	}
-
-	private void startOrResetTimer(boolean otherPlayerTurn) {
-		if (timer != null) {
-			timer.stop();
-		}
-
-		timer = new Timer(this, otherPlayerTurn);
-		timer.run();
-	}
-
-	public void notifyMadeMove(boolean isOtherPlayer) {
-		timer.stop();
-
-		timer = new Timer(this, !isOtherPlayer);
-		timer.run();
-	}
-
-	public JLabel getTimeInfo() {
-		return timeInfo;
 	}
 
 	public void setOtherPlayerTurn() {
@@ -253,57 +222,31 @@ public class View {
 	}
 
 	public void notifyTimeOver(boolean otherPlayerTurn) {
-		stopGame();
 		JOptionPane.showMessageDialog(null, "Time's up!");
 	}
 
-	public void stopGame() {
-		invalidThreads.add(currentThinker);
-		currentThinker = null;
-		Board board = Board.getInstance();
-		board.stopGame();
-		timer.stop();
+	public void makeMove(Position pos, Player player) {
+		String file = player.getSymbol().getFIle()+".png";
+		
+		ClickBox box = ClickBox.getBoxForPos(pos.getX(), pos.getY());
+		box.putBackground(file);
 	}
 
-	public void makeOtherPlayerMove() {
-		Runnable r = new Runnable() {
-			public void run(){
-				currentThinker = this;
-				Board board = Board.getInstance();
-		
-				Position otherPlayerMove = OtherPlayerMovementProvider.getAction(board);
-				Player otherPlayer = board.getOtherPlayer();
+	public void setTimeLeft(int timeLeft, boolean otherPlayerTurn) {
+		String whoHas = otherPlayerTurn ? "Bot has" : "You have";
+		String text = whoHas + " " + timeLeft+ 
+				" second" + (timeLeft == 1 ? "" : "s") + " to move";
 
-				if (invalidThreads.contains(this)) {
-					invalidThreads.remove(this);
-					return;
-				}
-
-				invalidThreads.remove(this);
-				board.tryMakeMove(otherPlayer, otherPlayerMove);
-		
-				String file = otherPlayer.getSymbol().getFIle()+".png";
-	
-				ClickBox box = ClickBox.getBoxForPos(otherPlayerMove.getX(), otherPlayerMove.getY());
-				box.putBackground(file);
-		
-				notifyMadeMove(true);
-	
-				Player winner = board.getWinner();
-				if (winner != null) {
-					gotWinner("Bot");
-				}
-			}
-		};
-
-		Thread t = new Thread(r);
-		t.start();
+		timeInfo.setText(text);
+		timeInfo.paintImmediately(timeInfo.getVisibleRect());
 	}
 
 	public void gotWinner(String who) {
-		stopGame();
-
 		JOptionPane.showMessageDialog(null, who+" Won!");
+	}
 
+	public void setConnected(String string) {
+		// TODO Auto-generated method stub
+		
 	}
 }

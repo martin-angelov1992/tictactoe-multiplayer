@@ -5,7 +5,7 @@ import java.util.Map;
 
 import javax.inject.Inject;
 
-import com.google.protobuf.GeneratedMessage;
+import com.google.protobuf.AbstractMessage;
 import com.google.protobuf.GeneratedMessage.GeneratedExtension;
 
 import io.netty.channel.ChannelHandlerContext;
@@ -15,7 +15,10 @@ import martin.tictactoe_multiplayer.Commands.BaseCommand;
 import martin.tictactoe_multiplayer.Commands.BaseCommand.CommandType;
 import martin.tictactoe_multiplayer.Commands.Move;
 import martin.tictactoe_multiplayer.communication.handlers.BaseCommandHandler;
-import martin.tictactoe_multiplayer.Commands.Move;
+import martin.tictactoe_multiplayer.communication.handlers.MoveHandler;
+import martin.tictactoe_multiplayer.communication.handlers.StartGameRequestHandler;
+import martin.tictactoe_multiplayer.communication.handlers.StartNewGameResponseHandler;
+import martin.tictactoe_multiplayer.communication.handlers.TimesUpHandler;
 
 public class CommunicationHandler extends SimpleChannelInboundHandler<BaseCommand> {
 
@@ -26,10 +29,10 @@ public class CommunicationHandler extends SimpleChannelInboundHandler<BaseComman
 
 	public CommunicationHandler() {
 		handlersMap = new HashMap<>();
-		handlersMap.put(CommandType.MOVE, new HandleInfo(handler, cmd));
-		handlersMap.put(key, value);
-		handlersMap.put(key, value);
-		handlersMap.put(key, value);
+		handlersMap.put(CommandType.MOVE, new HandleInfo(new MoveHandler(), Commands.Move.cmd));
+		handlersMap.put(CommandType.START_GAME_REQUEST, new HandleInfo(new StartGameRequestHandler(), Commands.StartNewGame.cmd));
+		handlersMap.put(CommandType.START_NEW_GAME_RESPONSE, new HandleInfo(new StartNewGameResponseHandler(), Commands.StartNewGameResponse.cmd));
+		handlersMap.put(CommandType.TIMES_UP, new HandleInfo(new TimesUpHandler(), Commands.TimesUp.cmd));
 	}
 
 	public CommunicationHandler(Communication communication) {
@@ -41,20 +44,6 @@ public class CommunicationHandler extends SimpleChannelInboundHandler<BaseComman
 		System.out.println("Message received");
 		HandleInfo info = handlersMap.get(msg.getType());
 		info.getHandler().handleCommand(msg.getExtension(info.getCmd()));
-		switch (msg.getType()) {
-		case MOVE:
-			Move move = msg.getExtension(Commands.Move.cmd);
-			System.out.println(move.getX() + " " + move.getY());
-			break;
-		case START_GAME_REQUEST:
-			break;
-		case START_NEW_GAME_RESPONSE:
-			break;
-		case TIMES_UP:
-			break;
-		default:
-			break;
-		}
 	}
 
 	@Override
@@ -84,9 +73,9 @@ public class CommunicationHandler extends SimpleChannelInboundHandler<BaseComman
 
 	private class HandleInfo {
 		private final BaseCommandHandler handler;
-		private final GeneratedExtension<BaseCommand, GeneratedMessage> cmd;
+		private final GeneratedExtension<BaseCommand, ? extends AbstractMessage> cmd;
 
-		public HandleInfo(BaseCommandHandler handler, GeneratedExtension<BaseCommand, GeneratedMessage> cmd) {
+		public HandleInfo(BaseCommandHandler handler, GeneratedExtension<BaseCommand, ? extends AbstractMessage> cmd) {
 			super();
 			this.handler = handler;
 			this.cmd = cmd;
@@ -96,7 +85,7 @@ public class CommunicationHandler extends SimpleChannelInboundHandler<BaseComman
 			return handler;
 		}
 
-		public GeneratedExtension<BaseCommand, GeneratedMessage> getCmd() {
+		public GeneratedExtension<BaseCommand, ? extends AbstractMessage> getCmd() {
 			return cmd;
 		}
 	}

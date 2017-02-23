@@ -19,6 +19,8 @@ import martin.tictactoe_multiplayer.Commands.StartNewGameResponse;
 import martin.tictactoe_multiplayer.Commands.TimesUp;
 
 public class Communication {
+	public static final int DEFAULT_PORT = 4000;
+
 	private Channel channel;
 
 	void setChannel(Channel channel) {

@@ -10,9 +10,13 @@ import java.util.HashSet;
 import java.util.Set;
 
 import javax.imageio.ImageIO;
+import javax.inject.Inject;
 import javax.swing.JPanel;
 
 public class ClickBox extends JPanel {
+
+	@Inject
+	private Game game;
 
 	private byte x;
 	private byte y;
@@ -35,23 +39,12 @@ public class ClickBox extends JPanel {
 
             @Override
             public void mouseClicked(MouseEvent e) {
-            	Board board = Board.getInstance();
-            	Player me = board.getPlayer();
-            	Position pos = Position.getPosition(ClickBox.this.x, ClickBox.this.y);
-            	boolean success = board.tryMakeMove(me, pos);
-            	if (success) {
-            		String file = me.getSymbol().getFIle()+".png";
-            		putBackground(file);
-            		view.setOtherPlayerTurn();
-            		view.notifyMadeMove(false);
-            		Player winner = board.getWinner();
-            		if (winner != null) {
-            			view.gotWinner("You");
-	            	}
-            		if (!board.isGameOver() && winner == null) {
-            			view.makeOtherPlayerMove();
-            		}
+            	if (!game.isMyTurn()) {
+            		return;
             	}
+
+            	Position pos = Position.getPosition(ClickBox.this.x, ClickBox.this.y);
+            	game.makeMove(pos);
             }
         });
 
