@@ -22,7 +22,7 @@ public class TestConnection extends TestCase {
 		};
 		new Thread(r).start();
 		client.connect("localhost", 4000);
-		client.sendMove((byte)1, (byte)1);
+		client.sendMove((byte)6, (byte)4);
 		Thread.sleep(5000);
 	}
 }

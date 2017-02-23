@@ -15,6 +15,7 @@ import martin.tictactoe_multiplayer.Commands.BaseCommand;
 import martin.tictactoe_multiplayer.Commands.BaseCommand.CommandType;
 import martin.tictactoe_multiplayer.Commands.Move;
 import martin.tictactoe_multiplayer.communication.handlers.BaseCommandHandler;
+import martin.tictactoe_multiplayer.Commands.Move;
 
 public class CommunicationHandler extends SimpleChannelInboundHandler<BaseCommand> {
 
