@@ -53,11 +53,8 @@ public class Communication {
 
 			// Create connection
 			channel = bootstrap.connect(host, port).sync().channel();
-			sendTimesUp();
 		} catch (InterruptedException e) {
 			e.printStackTrace();
-		} finally {
-			group.shutdownGracefully();
 		}
 	}
 
@@ -73,9 +70,8 @@ public class Communication {
 
 	public void sendMove(byte x, byte y) {
 		Move message = Move.newBuilder().setX(x).setY(y).build();
-		System.out.println("Sending move.");
+		System.out.println(message.getX() + " " + message.getY());
 		sendMessage(BaseCommand.CommandType.MOVE, Commands.Move.cmd, message);
-		System.out.println("Sent move.");
 	}
 
 	public void sendStartNewGameResponse(boolean agree) {
@@ -86,10 +82,10 @@ public class Communication {
 	private <Type> void sendMessage(BaseCommand.CommandType type, GeneratedExtension<BaseCommand, Type> extension,
 			Type cmd) {
 		BaseCommand wrapper = BaseCommand.newBuilder().setType(type).setExtension(extension, cmd).build();
+		System.out.println(wrapper.getExtension(Commands.Move.cmd).getX() + " " + wrapper.getExtension(Commands.Move.cmd).getY());
 		try {
 			channel.writeAndFlush(wrapper).sync();
 		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}

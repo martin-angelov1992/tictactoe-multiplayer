@@ -4,7 +4,6 @@ import org.junit.Test;
 
 import junit.framework.TestCase;
 import martin.tictactoe_multiplayer.communication.Communication;
-import martin.tictactoe_multiplayer.communication.CommunicationHandler;
 
 public class TestConnection extends TestCase {
 
