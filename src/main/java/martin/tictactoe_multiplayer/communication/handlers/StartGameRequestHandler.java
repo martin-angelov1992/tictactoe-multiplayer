@@ -13,6 +13,6 @@ public class StartGameRequestHandler extends BaseCommandHandler {
 	@Override
 	public void handleCommand(Object objCmd) {
 		StartNewGame cmd = (StartNewGame)objCmd;
-		game.
+		game.receiveNewGameRequestFromOtherPlayer(cmd);
 	}
 }

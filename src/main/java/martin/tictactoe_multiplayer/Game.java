@@ -35,13 +35,26 @@ public class Game {
 	}
 
 	public void notifyTimesUp() {
-		
+		timer.stop();
+		timer = null;
+
+		Player playerTurn = board.getPlayerTurn();
+		Player me = board.getPlayer();
+		Player otherPlayer = board.getOtherPlayer();
+
+		Player winner = playerTurn.equals(me) ? otherPlayer : me;
+
+		view.gotWinner(winner.getName());
 	}
 
 	public void startNewGame(boolean imFirst) {
+		if (timer != null) {
+			timer.stop();
+		}
+
 		timer = new Timer(this);
 		timer.run();
-		view.startNewGame();
+		view.startNewGame(imFirst);
 	}
 
 	public void notifyTimerTick(int timeLeft) {
@@ -65,12 +78,25 @@ public class Game {
 		return board.getPlayer().equals(board.getPlayerTurn());
 	}
 
-	public void requestNewGame(StartNewGame request) {
+	public void receiveNewGameRequestFromOtherPlayer(StartNewGame request) {
 		pendingRequest = request;
-		view.proposeNewGame(!request.getImFirst());
+		view.receiveStartNewGameRequestFromOtherPlayer(!request.getImFirst());
 	}
 
-	public void receiveNewGameResponse(boolean agree) {
+	public void receiveNewGameRequestFromUI(boolean imFirst) {
+		communication.sendStartNewGame(imFirst);
+		pendingRequest = StartNewGame.newBuilder().setImFirst(imFirst).build();
+	}
+
+	public void receiveNewGameResponseFromUI(boolean agree) {
+		if (agree) {
+			startNewGame(!pendingRequest.getImFirst());
+		}
+
+		pendingRequest = null;
+	}
+
+	public void receiveNewGameResponseFromOtherPlayer(boolean agree) {
 		if (agree) {
 			startNewGame(!pendingRequest.getImFirst());
 		}

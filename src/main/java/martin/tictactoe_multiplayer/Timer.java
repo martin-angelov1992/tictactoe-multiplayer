@@ -8,7 +8,7 @@ public class Timer {
 
 	private ScheduledExecutorService executor;
 	private Game game;
-	private int timeLeft;
+	private volatile Integer timeLeft;
 
 	public Timer(Game game) {
 		this.game = game;
@@ -23,13 +23,25 @@ public class Timer {
 	}
 
 	public void stop() {
-		executor.shutdown();
+		executor.shutdownNow();
+	}
+
+	public void reset() {
+		stop();
+		run();
 	}
 
 	private class Decreaser implements Runnable {
 
 		@Override
 		public void run() {
+			synchronized(timeLeft) {
+				if (Thread.interrupted()) {
+					return;
+				}
+
+				--timeLeft;
+			}
 			game.notifyTimerTick(timeLeft);
 		}
 	}

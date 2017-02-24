@@ -30,7 +30,9 @@ public class View {
 
 	private JLabel whosTurn;
 	private JLabel timeInfo;
+	private JLabel connectionLbl;
 
+	private JButton startNewGameBtn;
 	/**
 	 * Launch the application.
 	 */
@@ -94,10 +96,10 @@ public class View {
 		JPanel panel_3_3 = new ClickBox(2, 2, this);
 		panel_3_3.setBorder(new LineBorder(new Color(0, 0, 0)));
 		
-		JButton btnStartNewGame = new JButton("Start new game");
-		btnStartNewGame.addActionListener(new ActionListener() {
+		startNewGameBtn = new JButton("Start new game");
+		startNewGameBtn.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				startNewGame();
+				startNewGameRequest();
 			}
 		});
 		
@@ -106,6 +108,10 @@ public class View {
 		whosTurn = new JLabel("");
 		
 		timeInfo = new JLabel("");
+		
+		JButton connectionBtn = new JButton("Connect");
+		
+		connectionLbl = new JLabel("");
 		GroupLayout gl_panel = new GroupLayout(panel);
 		gl_panel.setHorizontalGroup(
 			gl_panel.createParallelGroup(Alignment.LEADING)
@@ -128,24 +134,31 @@ public class View {
 								.addComponent(panel_2_3, Alignment.TRAILING, 70, 70, 70)
 								.addComponent(panel_3_3, 70, 70, 70)))
 						.addGroup(gl_panel.createSequentialGroup()
-							.addComponent(btnStartNewGame)
+							.addComponent(startNewGameBtn)
 							.addPreferredGap(ComponentPlacement.RELATED)
 							.addGroup(gl_panel.createParallelGroup(Alignment.LEADING)
 								.addComponent(whosTurn, GroupLayout.PREFERRED_SIZE, 70, GroupLayout.PREFERRED_SIZE)
 								.addComponent(lblYourMarkerIs)))
-						.addComponent(timeInfo))
+						.addComponent(timeInfo)
+						.addGroup(gl_panel.createSequentialGroup()
+							.addComponent(connectionBtn)
+							.addPreferredGap(ComponentPlacement.RELATED)
+							.addComponent(connectionLbl, GroupLayout.PREFERRED_SIZE, 20, GroupLayout.PREFERRED_SIZE)))
 					.addContainerGap(31, Short.MAX_VALUE))
 		);
 		gl_panel.setVerticalGroup(
 			gl_panel.createParallelGroup(Alignment.LEADING)
 				.addGroup(gl_panel.createSequentialGroup()
-					.addContainerGap()
+					.addGroup(gl_panel.createParallelGroup(Alignment.BASELINE)
+						.addComponent(connectionBtn)
+						.addComponent(connectionLbl, GroupLayout.PREFERRED_SIZE, 23, GroupLayout.PREFERRED_SIZE))
+					.addPreferredGap(ComponentPlacement.RELATED)
 					.addGroup(gl_panel.createParallelGroup(Alignment.LEADING)
 						.addGroup(gl_panel.createSequentialGroup()
 							.addComponent(lblYourMarkerIs)
 							.addPreferredGap(ComponentPlacement.RELATED)
 							.addComponent(whosTurn))
-						.addComponent(btnStartNewGame))
+						.addComponent(startNewGameBtn))
 					.addPreferredGap(ComponentPlacement.RELATED)
 					.addComponent(timeInfo)
 					.addGap(10)
@@ -168,7 +181,7 @@ public class View {
 		panel.setLayout(gl_panel);
 	}
 
-	public void startNewGame() {
+	public void startNewGameRequest() {
 		Object[] options = {"Me","Other Player", "Cancel"};
 
 		int option = JOptionPane.showOptionDialog(null, 
@@ -182,17 +195,23 @@ public class View {
 
 		switch (option) {
 		case 0:
-			game.startNewGame(false);
-			clearBoard();
-			setMyTurn();
+			game.receiveNewGameRequestFromUI(true);
 			break;
 		case 1:
-			game.startNewGame(true);
-			clearBoard();
-			setOtherPlayerTurn();
+			game.receiveNewGameRequestFromUI(false);
 			break;
 		default:
 			return;
+		}
+	}
+
+	public void startNewGame(boolean imFirst) {
+		clearBoard();
+
+		if (imFirst) {
+			setMyTurn();
+		} else {
+			setOtherPlayerTurn();
 		}
 	}
 
@@ -245,13 +264,37 @@ public class View {
 		JOptionPane.showMessageDialog(null, who+" Won!");
 	}
 
-	public void setConnected(String string) {
-		// TODO Auto-generated method stub
-		
+	public void setConnected(String client) {
+		enableStartGameBtn();
+		visualiseConnectionInfoLabel(client);
 	}
 
-	public void proposeNewGame(boolean youFirst) {
-		// TODO Auto-generated method stub
+	private void visualiseConnectionInfoLabel(String client) {
+		connectionLbl.setText("You are now connected with: "+client);
+	}
+
+	private void enableStartGameBtn() {
+		startNewGameBtn.setEnabled(true);
+	}
+
+	public void setDisconnected() {
+		disableStartGameBtn();
+		clearConnectionInfoLabel();
+	}
+
+	private void clearConnectionInfoLabel() {
+		connectionLbl.setText("");
+	}
+
+	private void disableStartGameBtn() {
+		startNewGameBtn.setEnabled(false);
+	}
+
+	public void receiveStartNewGameRequestFromOtherPlayer(boolean imFirst) {
+		showPropositionFromOtherPlayer(imFirst);
+	}
+
+	private void showPropositionFromOtherPlayer(boolean imFirst) {
 		
 	}
 }
