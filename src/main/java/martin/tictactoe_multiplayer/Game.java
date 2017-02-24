@@ -2,6 +2,7 @@ package martin.tictactoe_multiplayer;
 
 import javax.inject.Inject;
 
+import martin.tictactoe_multiplayer.Commands.StartNewGame;
 import martin.tictactoe_multiplayer.communication.Communication;
 
 public class Game {
@@ -15,6 +16,8 @@ public class Game {
 	private Communication communication;
 
 	private Timer timer;
+
+	private StartNewGame pendingRequest;
 
 	public Game() {
 		communication.awaitConnection(Communication.DEFAULT_PORT);
@@ -38,6 +41,7 @@ public class Game {
 	public void startNewGame(boolean imFirst) {
 		timer = new Timer(this);
 		timer.run();
+		view.startNewGame();
 	}
 
 	public void notifyTimerTick(int timeLeft) {
@@ -59,5 +63,18 @@ public class Game {
 
 	public boolean isMyTurn() {
 		return board.getPlayer().equals(board.getPlayerTurn());
+	}
+
+	public void requestNewGame(StartNewGame request) {
+		pendingRequest = request;
+		view.proposeNewGame(!request.getImFirst());
+	}
+
+	public void receiveNewGameResponse(boolean agree) {
+		if (agree) {
+			startNewGame(!pendingRequest.getImFirst());
+		}
+
+		pendingRequest = null;
 	}
 }

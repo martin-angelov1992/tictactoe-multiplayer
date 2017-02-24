@@ -249,4 +249,9 @@ public class View {
 		// TODO Auto-generated method stub
 		
 	}
+
+	public void proposeNewGame(boolean youFirst) {
+		// TODO Auto-generated method stub
+		
+	}
 }
