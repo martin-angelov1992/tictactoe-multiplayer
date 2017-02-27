@@ -18,7 +18,6 @@ import martin.tictactoe_multiplayer.communication.handlers.BaseCommandHandler;
 import martin.tictactoe_multiplayer.communication.handlers.MoveHandler;
 import martin.tictactoe_multiplayer.communication.handlers.StartGameRequestHandler;
 import martin.tictactoe_multiplayer.communication.handlers.StartNewGameResponseHandler;
-import martin.tictactoe_multiplayer.communication.handlers.TimesUpHandler;
 
 public class CommunicationHandler extends SimpleChannelInboundHandler<BaseCommand> {
 
@@ -32,7 +31,6 @@ public class CommunicationHandler extends SimpleChannelInboundHandler<BaseComman
 		handlersMap.put(CommandType.MOVE, new HandleInfo(new MoveHandler(), Commands.Move.cmd));
 		handlersMap.put(CommandType.START_GAME_REQUEST, new HandleInfo(new StartGameRequestHandler(), Commands.StartNewGame.cmd));
 		handlersMap.put(CommandType.START_NEW_GAME_RESPONSE, new HandleInfo(new StartNewGameResponseHandler(), Commands.StartNewGameResponse.cmd));
-		handlersMap.put(CommandType.TIMES_UP, new HandleInfo(new TimesUpHandler(), Commands.TimesUp.cmd));
 	}
 
 	public CommunicationHandler(Communication communication) {
@@ -57,12 +55,6 @@ public class CommunicationHandler extends SimpleChannelInboundHandler<BaseComman
 	public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) {
 		cause.printStackTrace();
 		ctx.close();
-	}
-
-	@Override
-	public void channelRegistered(ChannelHandlerContext ctx) throws Exception {
-		System.out.println("Channel Registered");
-
 	}
 
 	@Override

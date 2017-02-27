@@ -19,21 +19,19 @@ public class CommunicationInitializer extends ChannelInitializer<SocketChannel> 
 		this.communication = communication;
 	}
 
-  @Override
-  protected void initChannel(SocketChannel ch) throws Exception {
-    ChannelPipeline p = ch.pipeline();
+	@Override
+	protected void initChannel(SocketChannel ch) throws Exception {
+		ChannelPipeline p = ch.pipeline();
 
-    ExtensionRegistry registry = ExtensionRegistry.newInstance();
-    Commands.registerAllExtensions(registry);
+		ExtensionRegistry registry = ExtensionRegistry.newInstance();
+		Commands.registerAllExtensions(registry);
 
-    p.addLast(new ProtobufVarint32FrameDecoder());
-    p.addLast(new ProtobufDecoder(Commands.BaseCommand.getDefaultInstance(), registry));
+		p.addLast(new ProtobufVarint32FrameDecoder());
+		p.addLast(new ProtobufDecoder(Commands.BaseCommand.getDefaultInstance(), registry));
 
-    p.addLast(new ProtobufVarint32LengthFieldPrepender());
-    p.addLast(new ProtobufEncoder());
+		p.addLast(new ProtobufVarint32LengthFieldPrepender());
+		p.addLast(new ProtobufEncoder());
 
-    p.addLast(new CommunicationHandler(communication));
-    
-  }
-  
+		p.addLast(new CommunicationHandler(communication));
+	}
 }

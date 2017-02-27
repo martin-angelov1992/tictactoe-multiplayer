@@ -16,11 +16,8 @@ import martin.tictactoe_multiplayer.Commands.BaseCommand;
 import martin.tictactoe_multiplayer.Commands.Move;
 import martin.tictactoe_multiplayer.Commands.StartNewGame;
 import martin.tictactoe_multiplayer.Commands.StartNewGameResponse;
-import martin.tictactoe_multiplayer.Commands.TimesUp;
 
 public class Communication {
-	public static final int DEFAULT_PORT = 4000;
-
 	private Channel channel;
 
 	void setChannel(Channel channel) {
@@ -37,13 +34,13 @@ public class Communication {
 
 		// Bind to port
 		try {
-			bootStrap.bind(port).sync().channel().closeFuture().sync();
+			bootStrap.bind(port).sync().channel().closeFuture();
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}
 	}
 
-	public void connect(String host, int port) {
+	public boolean connect(String host, int port) {
 		EventLoopGroup group = new NioEventLoopGroup();
 
 		try {
@@ -52,14 +49,10 @@ public class Communication {
 
 			// Create connection
 			channel = bootstrap.connect(host, port).sync().channel();
+			return true;
 		} catch (InterruptedException e) {
-			e.printStackTrace();
+			return false;
 		}
-	}
-
-	public void sendTimesUp() {
-		TimesUp message = TimesUp.newBuilder().build();
-		sendMessage(BaseCommand.CommandType.TIMES_UP, Commands.TimesUp.cmd, message);
 	}
 
 	public void sendStartNewGame(boolean imFirst) {
@@ -86,5 +79,9 @@ public class Communication {
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}
+	}
+
+	public void disconnect() {
+		channel.disconnect();
 	}
 }

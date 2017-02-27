@@ -20,7 +20,6 @@ public class Game {
 	private StartNewGame pendingRequest;
 
 	public Game() {
-		communication.awaitConnection(Communication.DEFAULT_PORT);
 	}
 
 	public void makeMove(Position pos) {
@@ -72,6 +71,7 @@ public class Game {
 	public void connect(String host, int port) {
 		communication.connect(host, port);
 		view.setConnected(host + ":" + port);
+		view.notifyConnectionFailed(host + ":" + port);
 	}
 
 	public boolean isMyTurn() {
@@ -102,5 +102,16 @@ public class Game {
 		}
 
 		pendingRequest = null;
+	}
+
+	public void disconnect() {
+		view.setDisconnected();
+		communication.disconnect();
+	}
+
+	public void run() {
+		int port = view.retrievePort();
+		communication.awaitConnection(port);
+		view.show();
 	}
 }

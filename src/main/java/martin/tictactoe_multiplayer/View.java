@@ -1,9 +1,12 @@
 package martin.tictactoe_multiplayer;
 
 import java.awt.EventQueue;
+import java.awt.Font;
 
 import javax.swing.JFrame;
 import javax.swing.JPanel;
+import javax.swing.JTextField;
+
 import java.awt.GridLayout;
 import java.util.Set;
 
@@ -18,8 +21,6 @@ import javax.swing.border.LineBorder;
 
 import java.awt.Color;
 import java.awt.Dimension;
-import java.awt.event.ActionListener;
-import java.awt.event.ActionEvent;
 
 public class View {
 
@@ -33,15 +34,16 @@ public class View {
 	private JLabel connectionLbl;
 
 	private JButton startNewGameBtn;
+	private ConnectionBtn connectionBtn;
+
 	/**
 	 * Launch the application.
 	 */
-	public static void main(String[] args) {
+	public void show() {
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
 				try {
-					View window = new View();
-					window.frame.setVisible(true);
+					frame.setVisible(true);
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
@@ -97,27 +99,29 @@ public class View {
 		panel_3_3.setBorder(new LineBorder(new Color(0, 0, 0)));
 		
 		startNewGameBtn = new JButton("Start new game");
-		startNewGameBtn.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				startNewGameRequest();
-			}
+		startNewGameBtn.setEnabled(false);
+		startNewGameBtn.addActionListener((e) -> {
+			startNewGameRequest();
 		});
-		
+		connectionBtn = new ConnectionBtn("Connect");
+
+		connectionBtn.addActionListener((e) -> {
+			connectionBtnClicked();
+		});
 		JLabel lblYourMarkerIs = new JLabel("Your marker is \"X\"");
 		
 		whosTurn = new JLabel("");
 		
 		timeInfo = new JLabel("");
 		
-		JButton connectionBtn = new JButton("Connect");
-		
 		connectionLbl = new JLabel("");
+		connectionLbl.setFont(new Font("Serif", Font.PLAIN, 12));
 		GroupLayout gl_panel = new GroupLayout(panel);
 		gl_panel.setHorizontalGroup(
 			gl_panel.createParallelGroup(Alignment.LEADING)
 				.addGroup(gl_panel.createSequentialGroup()
 					.addContainerGap()
-					.addGroup(gl_panel.createParallelGroup(Alignment.LEADING)
+					.addGroup(gl_panel.createParallelGroup(Alignment.LEADING, false)
 						.addGroup(gl_panel.createSequentialGroup()
 							.addGroup(gl_panel.createParallelGroup(Alignment.LEADING)
 								.addComponent(panel_3_1, Alignment.TRAILING, 70, 70, 70)
@@ -141,16 +145,16 @@ public class View {
 								.addComponent(lblYourMarkerIs)))
 						.addComponent(timeInfo)
 						.addGroup(gl_panel.createSequentialGroup()
-							.addComponent(connectionBtn)
+							.addComponent(connectionBtn, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
 							.addPreferredGap(ComponentPlacement.RELATED)
-							.addComponent(connectionLbl, GroupLayout.PREFERRED_SIZE, 20, GroupLayout.PREFERRED_SIZE)))
+							.addComponent(connectionLbl, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
 					.addContainerGap(31, Short.MAX_VALUE))
 		);
 		gl_panel.setVerticalGroup(
 			gl_panel.createParallelGroup(Alignment.LEADING)
 				.addGroup(gl_panel.createSequentialGroup()
 					.addGroup(gl_panel.createParallelGroup(Alignment.BASELINE)
-						.addComponent(connectionBtn)
+						.addComponent(connectionBtn, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
 						.addComponent(connectionLbl, GroupLayout.PREFERRED_SIZE, 23, GroupLayout.PREFERRED_SIZE))
 					.addPreferredGap(ComponentPlacement.RELATED)
 					.addGroup(gl_panel.createParallelGroup(Alignment.LEADING)
@@ -179,6 +183,34 @@ public class View {
 					.addContainerGap())
 		);
 		panel.setLayout(gl_panel);
+	}
+
+	private void connectionBtnClicked() {
+		if (connectionBtn.isInConnectedState()) {
+			game.disconnect();
+		} else {
+			showConnectDialog();
+		}
+	}
+
+	private void showConnectDialog() {
+		JTextField hostField = new JTextField();
+		JTextField portField = new JTextField();
+
+		Object[] message = {
+			    "Host:", hostField,
+			    "Port:", portField
+			};
+
+		int option = JOptionPane.showConfirmDialog(null, message, "Connect", JOptionPane.OK_CANCEL_OPTION);
+
+		if (option == JOptionPane.OK_OPTION) {
+		    String host = hostField.getText();
+		    String port = portField.getText();
+
+		    game.connect(host, Integer.valueOf(port));
+		    connectionLbl.setText("Connecting to: "+host+":"+port);
+		}
 	}
 
 	public void startNewGameRequest() {
@@ -267,10 +299,22 @@ public class View {
 	public void setConnected(String client) {
 		enableStartGameBtn();
 		visualiseConnectionInfoLabel(client);
+		changeButtonToConnectedState();
+	}
+
+	private void changeButtonToConnectedState() {
+		connectionBtn.setText("Disconnect");
+		connectionBtn.setInConnectedState(true);
+	}
+
+	private void changeButtonToDisconnectedState() {
+		connectionBtn.setText("Connect");
+		connectionBtn.setInConnectedState(false);
 	}
 
 	private void visualiseConnectionInfoLabel(String client) {
 		connectionLbl.setText("You are now connected with: "+client);
+		connectionLbl.setForeground(Color.red);
 	}
 
 	private void enableStartGameBtn() {
@@ -280,6 +324,7 @@ public class View {
 	public void setDisconnected() {
 		disableStartGameBtn();
 		clearConnectionInfoLabel();
+		changeButtonToDisconnectedState();
 	}
 
 	private void clearConnectionInfoLabel() {
@@ -295,6 +340,38 @@ public class View {
 	}
 
 	private void showPropositionFromOtherPlayer(boolean imFirst) {
-		
+		Object[] options = {"Accept","Decline"};
+
+		int option = JOptionPane.showOptionDialog(null, 
+				"Hey, let's play? " + (imFirst ? "You can go first." : "I want to go first."), 
+				"Accept?", 
+				JOptionPane.YES_NO_OPTION,
+			    JOptionPane.QUESTION_MESSAGE,
+			    null,
+			    options,
+			    options[0]);
+
+		switch (option) {
+		case 0:
+			game.receiveNewGameResponseFromUI(true);
+			break;
+		case 1:
+			game.receiveNewGameResponseFromUI(false);
+			break;
+		default:
+			return;
+		}
+	}
+
+	public int retrievePort() {
+		String portStr = JOptionPane.showInputDialog(null, "Please enter a port to listen for connection.");
+
+		int port = Integer.valueOf(portStr);
+
+		return port;
+	}
+
+	public void notifyConnectionFailed(String host) {
+		connectionLbl.setText("Connection to " + host + " failed.");
 	}
 }

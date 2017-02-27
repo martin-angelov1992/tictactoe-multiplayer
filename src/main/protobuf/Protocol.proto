@@ -42,10 +42,3 @@ message Move {
         required int32 x = 1;
         required int32 y = 2;
 }
-
-// sent by player1 waiting for player2 to make a move, when player2 time is up
-message TimesUp {
-        extend BaseCommand {
-                optional TimesUp cmd = 103;
-        }
-}
