@@ -5,6 +5,7 @@ import com.google.protobuf.GeneratedMessage.GeneratedExtension;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.Channel;
+import io.netty.channel.ChannelFuture;
 import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
@@ -18,7 +19,7 @@ import martin.tictactoe_multiplayer.Commands.StartNewGame;
 import martin.tictactoe_multiplayer.Commands.StartNewGameResponse;
 
 public class Communication {
-	private Channel channel;
+	private volatile Channel channel;
 
 	void setChannel(Channel channel) {
 		this.channel = channel;
@@ -43,16 +44,19 @@ public class Communication {
 	public boolean connect(String host, int port) {
 		EventLoopGroup group = new NioEventLoopGroup();
 
-		try {
-			Bootstrap bootstrap = new Bootstrap();
-			bootstrap.group(group).channel(NioSocketChannel.class).handler(new CommunicationInitializer(this));
+		Bootstrap bootstrap = new Bootstrap();
+		bootstrap.group(group).channel(NioSocketChannel.class).handler(new CommunicationInitializer(this));
 
-			// Create connection
-			channel = bootstrap.connect(host, port).sync().channel();
-			return true;
-		} catch (InterruptedException e) {
+		
+		ChannelFuture future = bootstrap.connect(host, port);
+
+		if (!future.isSuccess()) {
 			return false;
 		}
+
+		// Create connection
+		channel = future.channel();
+		return true;
 	}
 
 	public void sendStartNewGame(boolean imFirst) {

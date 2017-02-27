@@ -69,9 +69,12 @@ public class Game {
 	}
 
 	public void connect(String host, int port) {
-		communication.connect(host, port);
-		view.setConnected(host + ":" + port);
-		view.notifyConnectionFailed(host + ":" + port);
+		boolean success = communication.connect(host, port);
+		if (success) {
+			view.setConnected(host + ":" + port);
+		} else {
+			view.notifyConnectionFailed(host + ":" + port);
+		}
 	}
 
 	public boolean isMyTurn() {

@@ -207,9 +207,9 @@ public class View {
 		if (option == JOptionPane.OK_OPTION) {
 		    String host = hostField.getText();
 		    String port = portField.getText();
+		    connectionLbl.setText("Connecting to: "+host+":"+port);
 
 		    game.connect(host, Integer.valueOf(port));
-		    connectionLbl.setText("Connecting to: "+host+":"+port);
 		}
 	}
 
