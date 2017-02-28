@@ -1,5 +1,6 @@
 package martin.tictactoe_multiplayer.communication;
 
+import java.net.InetSocketAddress;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -10,10 +11,12 @@ import com.google.protobuf.GeneratedMessage.GeneratedExtension;
 
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
+import io.netty.channel.socket.nio.NioSocketChannel;
 import martin.tictactoe_multiplayer.Commands;
 import martin.tictactoe_multiplayer.Commands.BaseCommand;
 import martin.tictactoe_multiplayer.Commands.BaseCommand.CommandType;
 import martin.tictactoe_multiplayer.Commands.Move;
+import martin.tictactoe_multiplayer.Game;
 import martin.tictactoe_multiplayer.communication.handlers.BaseCommandHandler;
 import martin.tictactoe_multiplayer.communication.handlers.MoveHandler;
 import martin.tictactoe_multiplayer.communication.handlers.StartGameRequestHandler;
@@ -23,6 +26,9 @@ public class CommunicationHandler extends SimpleChannelInboundHandler<BaseComman
 
 	@Inject
 	private Communication communication;
+
+	@Inject
+	private Game game;
 
 	private Map<CommandType, HandleInfo> handlersMap;
 
@@ -59,8 +65,10 @@ public class CommunicationHandler extends SimpleChannelInboundHandler<BaseComman
 
 	@Override
 	public void channelActive(ChannelHandlerContext ctx) throws Exception {
-		communication.setChannel(ctx.channel());
-		System.out.println("Channel Active");
+		NioSocketChannel channel = (NioSocketChannel)ctx.channel();
+		InetSocketAddress address = channel.localAddress();
+		communication.setChannel(channel);
+		game.connect(address.getHostName());
 	}
 
 	private class HandleInfo {

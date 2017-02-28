@@ -50,6 +50,7 @@ public class Communication {
 		
 		ChannelFuture future = bootstrap.connect(host, port);
 
+		future.awaitUninterruptibly();
 		if (!future.isSuccess()) {
 			return false;
 		}

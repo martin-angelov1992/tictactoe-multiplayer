@@ -68,12 +68,23 @@ public class Game {
 		}
 	}
 
-	public void connect(String host, int port) {
+	public void connect(String host) {
+		connect(host, null);
+	}
+
+	public void connect(String host, Integer port) {
 		boolean success = communication.connect(host, port);
+
+		String hostInfo = host;
+
+		if (port != null) {
+			hostInfo += ":" + port;
+		}
+
 		if (success) {
-			view.setConnected(host + ":" + port);
+			view.setConnected(hostInfo);
 		} else {
-			view.notifyConnectionFailed(host + ":" + port);
+			view.notifyConnectionFailed(hostInfo);
 		}
 	}
 
