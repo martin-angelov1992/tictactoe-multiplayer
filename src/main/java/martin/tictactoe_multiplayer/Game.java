@@ -68,10 +68,6 @@ public class Game {
 		}
 	}
 
-	public void connect(String host) {
-		connect(host, null);
-	}
-
 	public void connect(String host, Integer port) {
 		boolean success = communication.connect(host, port);
 
@@ -86,6 +82,10 @@ public class Game {
 		} else {
 			view.notifyConnectionFailed(hostInfo);
 		}
+	}
+
+	public void notifyConnectionMade(String host) {
+		view.setConnected(host);
 	}
 
 	public boolean isMyTurn() {

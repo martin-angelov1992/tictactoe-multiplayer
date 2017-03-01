@@ -1,5 +1,7 @@
 package martin.tictactoe_multiplayer.communication;
 
+import javax.inject.Inject;
+
 import com.google.protobuf.GeneratedMessage.GeneratedExtension;
 
 import io.netty.bootstrap.Bootstrap;
@@ -19,6 +21,11 @@ import martin.tictactoe_multiplayer.Commands.StartNewGame;
 import martin.tictactoe_multiplayer.Commands.StartNewGameResponse;
 
 public class Communication {
+	private boolean isHost;
+
+	@Inject
+	private CommunicationInitializer communicationInitializer;
+
 	private volatile Channel channel;
 
 	void setChannel(Channel channel) {
@@ -31,10 +38,11 @@ public class Communication {
 
 		ServerBootstrap bootStrap = new ServerBootstrap();
 		bootStrap.group(serverGroup, workerGroup).channel(NioServerSocketChannel.class)
-				.handler(new LoggingHandler(LogLevel.INFO)).childHandler(new CommunicationInitializer(this));
+				.handler(new LoggingHandler(LogLevel.INFO)).childHandler(communicationInitializer);
 
 		// Bind to port
 		try {
+			isHost = true;
 			bootStrap.bind(port).sync().channel().closeFuture();
 		} catch (InterruptedException e) {
 			e.printStackTrace();
@@ -45,9 +53,8 @@ public class Communication {
 		EventLoopGroup group = new NioEventLoopGroup();
 
 		Bootstrap bootstrap = new Bootstrap();
-		bootstrap.group(group).channel(NioSocketChannel.class).handler(new CommunicationInitializer(this));
+		bootstrap.group(group).channel(NioSocketChannel.class).handler(communicationInitializer);
 
-		
 		ChannelFuture future = bootstrap.connect(host, port);
 
 		future.awaitUninterruptibly();
@@ -57,6 +64,7 @@ public class Communication {
 
 		// Create connection
 		channel = future.channel();
+		isHost = false;
 		return true;
 	}
 
@@ -88,5 +96,9 @@ public class Communication {
 
 	public void disconnect() {
 		channel.disconnect();
+	}
+
+	public boolean isHost() {
+		return isHost;
 	}
 }

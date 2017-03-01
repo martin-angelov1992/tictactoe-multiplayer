@@ -1,5 +1,7 @@
 package martin.tictactoe_multiplayer.communication;
 
+import javax.inject.Inject;
+
 import com.google.protobuf.ExtensionRegistry;
 
 import io.netty.channel.ChannelInitializer;
@@ -13,11 +15,8 @@ import martin.tictactoe_multiplayer.Commands;
 
 public class CommunicationInitializer extends ChannelInitializer<SocketChannel> {
 
-	private Communication communication;
-
-	public CommunicationInitializer(Communication communication) {
-		this.communication = communication;
-	}
+	@Inject
+	private CommunicationHandler connectionHandler;
 
 	@Override
 	protected void initChannel(SocketChannel ch) throws Exception {
@@ -32,6 +31,6 @@ public class CommunicationInitializer extends ChannelInitializer<SocketChannel> 
 		p.addLast(new ProtobufVarint32LengthFieldPrepender());
 		p.addLast(new ProtobufEncoder());
 
-		p.addLast(new CommunicationHandler(communication));
+		p.addLast(connectionHandler);
 	}
 }

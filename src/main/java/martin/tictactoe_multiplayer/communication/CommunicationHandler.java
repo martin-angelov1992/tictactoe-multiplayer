@@ -68,7 +68,9 @@ public class CommunicationHandler extends SimpleChannelInboundHandler<BaseComman
 		NioSocketChannel channel = (NioSocketChannel)ctx.channel();
 		InetSocketAddress address = channel.localAddress();
 		communication.setChannel(channel);
-		game.connect(address.getHostName());
+		if (communication.isHost()) {
+			game.notifyConnectionMade(address.getHostName());
+		}
 	}
 
 	private class HandleInfo {

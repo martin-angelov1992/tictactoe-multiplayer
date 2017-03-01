@@ -47,7 +47,7 @@ public class Player {
 		return new Player(name, ID, true, Symbol.O);
 	}
 
-	public static Player newPlayer(String name, byte ID) {
+	public static Player newOtherPlayer(String name, byte ID) {
 		return new Player(name, ID, false, Symbol.X);
 	}
 }

@@ -35,6 +35,7 @@ public class View {
 
 	private JButton startNewGameBtn;
 	private ConnectionBtn connectionBtn;
+	private JLabel lblYourMarkerIs;
 
 	/**
 	 * Launch the application.
@@ -108,7 +109,7 @@ public class View {
 		connectionBtn.addActionListener((e) -> {
 			connectionBtnClicked();
 		});
-		JLabel lblYourMarkerIs = new JLabel("Your marker is \"X\"");
+		lblYourMarkerIs = new JLabel();
 		
 		whosTurn = new JLabel("");
 		
@@ -256,8 +257,10 @@ public class View {
 		clearBoard();
 
 		if (imFirst) {
+			lblYourMarkerIs.setText("Your marker is \"X\"");
 			setMyTurn();
 		} else {
+			lblYourMarkerIs.setText("Your marker is \"Y\"");
 			setOtherPlayerTurn();
 		}
 	}
