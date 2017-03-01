@@ -15,6 +15,6 @@ public class MoveHandler extends BaseCommandHandler {
 	public void handleCommand(Object objCmd) {
 		Move cmd = (Move)objCmd;
 		Position pos = Position.getPosition((byte)cmd.getX(), (byte)cmd.getY());
-		game.makeMove(pos);
+		game.makeMoveRequestFromOtherPlayer(pos);
 	}
 }

@@ -9,14 +9,14 @@ public class Player {
 	public enum Symbol {
 		X("X"), O("O");
 
-		private String file;
+		private String symbol;
 
-		private Symbol(String file) {
-			this.file = file;
+		private Symbol(String symbol) {
+			this.symbol = symbol;
 		}
 
-		public String getFIle() {
-			return file;
+		public String getSymbol() {
+			return symbol;
 		}
 	}
 
@@ -43,11 +43,11 @@ public class Player {
 		return symbol;
 	}
 
-	public static Player newBot(String name, byte ID) {
-		return new Player(name, ID, true, Symbol.O);
+	public void setSymbol(Symbol symbol) {
+		this.symbol = symbol;
 	}
 
-	public static Player newOtherPlayer(String name, byte ID) {
-		return new Player(name, ID, false, Symbol.X);
+	public static Player newPlayer(String name, byte ID, boolean isMe) {
+		return new Player(name, ID, isMe, null);
 	}
 }

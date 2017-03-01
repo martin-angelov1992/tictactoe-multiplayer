@@ -53,19 +53,14 @@ public class View {
 	}
 
 	/**
-	 * Create the application.
-	 */
-	public View() {
-		initialize();
-	}
-
-	/**
 	 * Initialize the contents of the frame.
+	 * @wbp.parser.entryPoint
 	 */
-	private void initialize() {
+	@Inject
+	public void initialize() {
 		frame = new JFrame();
 		frame.setResizable(false);
-		frame.setBounds(100, 100, 269, 362);
+		frame.setBounds(100, 100, 269, 431);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.getContentPane().setLayout(new GridLayout(1, 0, 0, 0));
 		
@@ -109,7 +104,7 @@ public class View {
 		connectionBtn.addActionListener((e) -> {
 			connectionBtnClicked();
 		});
-		lblYourMarkerIs = new JLabel();
+		lblYourMarkerIs = new JLabel("");
 		
 		whosTurn = new JLabel("");
 		
@@ -121,9 +116,10 @@ public class View {
 		gl_panel.setHorizontalGroup(
 			gl_panel.createParallelGroup(Alignment.LEADING)
 				.addGroup(gl_panel.createSequentialGroup()
+					.addContainerGap()
 					.addGroup(gl_panel.createParallelGroup(Alignment.LEADING)
+						.addComponent(timeInfo, GroupLayout.DEFAULT_SIZE, 253, Short.MAX_VALUE)
 						.addGroup(gl_panel.createSequentialGroup()
-							.addContainerGap()
 							.addGroup(gl_panel.createParallelGroup(Alignment.LEADING)
 								.addGroup(gl_panel.createSequentialGroup()
 									.addGroup(gl_panel.createParallelGroup(Alignment.LEADING)
@@ -143,49 +139,40 @@ public class View {
 										.addComponent(panel_3_3, 70, 70, 70)
 										.addComponent(panel_2_3, 70, 70, 70)))
 								.addGroup(gl_panel.createSequentialGroup()
-									.addGroup(gl_panel.createParallelGroup(Alignment.TRAILING)
-										.addGroup(gl_panel.createSequentialGroup()
-											.addComponent(startNewGameBtn)
-											.addPreferredGap(ComponentPlacement.RELATED, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-											.addGroup(gl_panel.createParallelGroup(Alignment.LEADING)
-												.addComponent(timeInfo)
-												.addComponent(lblYourMarkerIs))
-											.addGap(32))
-										.addGroup(gl_panel.createSequentialGroup()
-											.addComponent(connectionLbl, GroupLayout.DEFAULT_SIZE, 224, Short.MAX_VALUE)
-											.addPreferredGap(ComponentPlacement.RELATED)))
-									.addComponent(whosTurn, GroupLayout.PREFERRED_SIZE, 70, GroupLayout.PREFERRED_SIZE)
-									.addGap(39))))
+									.addComponent(startNewGameBtn)
+									.addPreferredGap(ComponentPlacement.RELATED)
+									.addComponent(connectionBtn, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)))
+							.addGap(24))
 						.addGroup(gl_panel.createSequentialGroup()
-							.addGap(86)
-							.addComponent(connectionBtn, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)))
-					.addContainerGap())
+							.addComponent(connectionLbl, GroupLayout.DEFAULT_SIZE, 243, Short.MAX_VALUE)
+							.addContainerGap())
+						.addGroup(Alignment.TRAILING, gl_panel.createSequentialGroup()
+							.addComponent(lblYourMarkerIs, GroupLayout.DEFAULT_SIZE, 243, Short.MAX_VALUE)
+							.addContainerGap())
+						.addGroup(gl_panel.createSequentialGroup()
+							.addComponent(whosTurn, GroupLayout.DEFAULT_SIZE, 243, Short.MAX_VALUE)
+							.addContainerGap())))
 		);
 		gl_panel.setVerticalGroup(
 			gl_panel.createParallelGroup(Alignment.LEADING)
 				.addGroup(gl_panel.createSequentialGroup()
-					.addComponent(connectionBtn, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-					.addGap(8)
-					.addGroup(gl_panel.createParallelGroup(Alignment.TRAILING)
-						.addGroup(gl_panel.createSequentialGroup()
-							.addComponent(whosTurn)
-							.addGap(11))
-						.addGroup(gl_panel.createSequentialGroup()
-							.addComponent(connectionLbl, GroupLayout.PREFERRED_SIZE, 23, GroupLayout.PREFERRED_SIZE)
-							.addPreferredGap(ComponentPlacement.RELATED)))
-					.addGroup(gl_panel.createParallelGroup(Alignment.TRAILING, false)
-						.addGroup(gl_panel.createSequentialGroup()
-							.addComponent(timeInfo)
-							.addGap(27)
-							.addComponent(panel_1_3, 70, 70, 70))
-						.addGroup(gl_panel.createSequentialGroup()
-							.addGroup(gl_panel.createParallelGroup(Alignment.BASELINE)
-								.addComponent(startNewGameBtn)
-								.addComponent(lblYourMarkerIs))
-							.addPreferredGap(ComponentPlacement.RELATED, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-							.addGroup(gl_panel.createParallelGroup(Alignment.LEADING)
-								.addComponent(panel_1_2, Alignment.TRAILING, 70, 70, 70)
-								.addComponent(panel_1_1, Alignment.TRAILING, 70, 70, 70))))
+					.addContainerGap()
+					.addGroup(gl_panel.createParallelGroup(Alignment.BASELINE)
+						.addComponent(startNewGameBtn)
+						.addComponent(connectionBtn, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+					.addPreferredGap(ComponentPlacement.UNRELATED)
+					.addComponent(connectionLbl, GroupLayout.PREFERRED_SIZE, 20, GroupLayout.PREFERRED_SIZE)
+					.addGap(9)
+					.addComponent(timeInfo, GroupLayout.PREFERRED_SIZE, 23, GroupLayout.PREFERRED_SIZE)
+					.addPreferredGap(ComponentPlacement.RELATED)
+					.addComponent(lblYourMarkerIs, GroupLayout.PREFERRED_SIZE, 18, GroupLayout.PREFERRED_SIZE)
+					.addPreferredGap(ComponentPlacement.RELATED)
+					.addComponent(whosTurn, GroupLayout.PREFERRED_SIZE, 20, GroupLayout.PREFERRED_SIZE)
+					.addPreferredGap(ComponentPlacement.RELATED, 65, Short.MAX_VALUE)
+					.addGroup(gl_panel.createParallelGroup(Alignment.LEADING)
+						.addComponent(panel_1_3, Alignment.TRAILING, 70, 70, 70)
+						.addComponent(panel_1_2, Alignment.TRAILING, 70, 70, 70)
+						.addComponent(panel_1_1, Alignment.TRAILING, 70, 70, 70))
 					.addPreferredGap(ComponentPlacement.RELATED)
 					.addGroup(gl_panel.createParallelGroup(Alignment.TRAILING)
 						.addComponent(panel_2_2, 70, 70, 70)
@@ -253,23 +240,23 @@ public class View {
 		}
 	}
 
-	public void startNewGame(boolean imFirst) {
+	public void startNewGame(Player me, boolean imFirst) {
 		clearBoard();
 
 		if (imFirst) {
-			lblYourMarkerIs.setText("Your marker is \"X\"");
 			setMyTurn();
 		} else {
-			lblYourMarkerIs.setText("Your marker is \"Y\"");
 			setOtherPlayerTurn();
 		}
+
+		lblYourMarkerIs.setText("Your marker is \""+me.getSymbol().getSymbol()+"\"");
 	}
 
 	public void setOtherPlayerTurn() {
 		setTurn("Other player thinks.", Color.BLACK);
 	}
 
-	private void setMyTurn() {
+	public void setMyTurn() {
 		setTurn("Your turn.", Color.RED);
 	}
 
@@ -291,11 +278,11 @@ public class View {
 	}
 
 	public void notifyTimeOver(boolean otherPlayerTurn) {
-		JOptionPane.showMessageDialog(null, "Time's up!");
+		showMessage("Time's up!");
 	}
 
 	public void makeMove(Position pos, Player player) {
-		String file = player.getSymbol().getFIle()+".png";
+		String file = player.getSymbol().getSymbol()+".png";
 		
 		ClickBox box = ClickBox.getBoxForPos(pos.getX(), pos.getY());
 		box.putBackground(file);
@@ -310,8 +297,9 @@ public class View {
 		timeInfo.paintImmediately(timeInfo.getVisibleRect());
 	}
 
-	public void gotWinner(String who) {
-		JOptionPane.showMessageDialog(null, who+" Won!");
+	public void gotWinner(Player who) {
+		String text = who.isMe() ? "You Won!" : "Other Player Won!";
+		showMessage(text);
 	}
 
 	public void setConnected(String client) {
@@ -343,6 +331,13 @@ public class View {
 		disableStartGameBtn();
 		clearConnectionInfoLabel();
 		changeButtonToDisconnectedState();
+	}
+
+	public void notifyDisconnected() {
+		disableStartGameBtn();
+		changeButtonToDisconnectedState();
+		connectionLbl.setText("You have been disconnected");
+		connectionLbl.setForeground(Color.red);
 	}
 
 	private void clearConnectionInfoLabel() {
@@ -392,5 +387,22 @@ public class View {
 	public void notifyConnectionFailed(String host) {
 		connectionLbl.setText("Connection to " + host + " failed.");
 		connectionLbl.setForeground(Color.red);
+	}
+
+	public Game getGame() {
+		return game;
+	}
+
+	public void notifyDraw() {
+		showMessage("It's draw!");
+	}
+
+	public void showMessage(String message) {
+		  Thread t = new Thread(new Runnable(){
+		        public void run(){
+		            JOptionPane.showMessageDialog(null, message);
+		        }
+		    });
+		  t.start();
 	}
 }

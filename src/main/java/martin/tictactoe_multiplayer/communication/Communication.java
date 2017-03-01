@@ -8,6 +8,7 @@ import io.netty.bootstrap.Bootstrap;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
+import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
@@ -19,12 +20,16 @@ import martin.tictactoe_multiplayer.Commands.BaseCommand;
 import martin.tictactoe_multiplayer.Commands.Move;
 import martin.tictactoe_multiplayer.Commands.StartNewGame;
 import martin.tictactoe_multiplayer.Commands.StartNewGameResponse;
+import martin.tictactoe_multiplayer.Game;
 
 public class Communication {
 	private boolean isHost;
 
 	@Inject
 	private CommunicationInitializer communicationInitializer;
+
+	@Inject
+	private Game game;
 
 	private volatile Channel channel;
 
@@ -43,7 +48,12 @@ public class Communication {
 		// Bind to port
 		try {
 			isHost = true;
-			bootStrap.bind(port).sync().channel().closeFuture();
+			bootStrap.bind(port).sync().channel().closeFuture().addListener(new ChannelFutureListener() {
+		        @Override
+		        public void operationComplete(ChannelFuture future) throws Exception {
+		           game.notifyDisconnected();
+		        }
+		    });
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}
@@ -56,15 +66,23 @@ public class Communication {
 		bootstrap.group(group).channel(NioSocketChannel.class).handler(communicationInitializer);
 
 		ChannelFuture future = bootstrap.connect(host, port);
+		isHost = false;
 
 		future.awaitUninterruptibly();
 		if (!future.isSuccess()) {
+			// it is still awaiting connection
+			isHost = true;
 			return false;
 		}
 
 		// Create connection
 		channel = future.channel();
-		isHost = false;
+		channel.closeFuture().addListener(new ChannelFutureListener() {
+	        @Override
+	        public void operationComplete(ChannelFuture future) throws Exception {
+	           game.notifyDisconnected();
+	        }
+	    });
 		return true;
 	}
 
@@ -85,8 +103,8 @@ public class Communication {
 
 	private <Type> void sendMessage(BaseCommand.CommandType type, GeneratedExtension<BaseCommand, Type> extension,
 			Type cmd) {
+		System.out.println("Receiving "+type);
 		BaseCommand wrapper = BaseCommand.newBuilder().setType(type).setExtension(extension, cmd).build();
-		System.out.println(wrapper.getExtension(Commands.Move.cmd).getX() + " " + wrapper.getExtension(Commands.Move.cmd).getY());
 		try {
 			channel.writeAndFlush(wrapper).sync();
 		} catch (InterruptedException e) {
@@ -96,6 +114,7 @@ public class Communication {
 
 	public void disconnect() {
 		channel.disconnect();
+		channel.close();
 	}
 
 	public boolean isHost() {

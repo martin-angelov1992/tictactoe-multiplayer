@@ -17,7 +17,6 @@ public class Board {
 	private boolean gameStarted = false;
 	private boolean gameOver = false;
 	private static Set<WinnerChecker> checkers;
-	private static Board instance;
 
 	static {
 		initCheckersSet();
@@ -37,8 +36,8 @@ public class Board {
 	}
 
 	private void addDefaultPlayers() {
-		Player me = Player.newPlayer("me", (byte)1);
-		Player otherPlayer = Player.newBot("other player", (byte)2);
+		Player me = Player.newPlayer("me", (byte)1, true);
+		Player otherPlayer = Player.newPlayer("other player", (byte)2, false);
 		players.add(me);
 		players.add(otherPlayer);
 	}
@@ -109,7 +108,7 @@ public class Board {
 
 	public Player getPlayer() {
 		for (Player player : players) {
-			if (!player.isMe()) {
+			if (player.isMe()) {
 				return player;
 			}
 		}
@@ -119,7 +118,7 @@ public class Board {
 
 	public Player getOtherPlayer() {
 		for (Player player : players) {
-			if (player.isMe()) {
+			if (!player.isMe()) {
 				return player;
 			}
 		}
@@ -150,9 +149,9 @@ public class Board {
 	}
 
 	public void startNewGame(boolean otherPlayerFirst) {
-		instance = new Board();
-		instance.gameStarted = true;
-		instance.playerTurn = otherPlayerFirst ? instance.getOtherPlayer() : instance.getPlayer();
+		gameOver = false;
+		gameStarted = true;
+		playerTurn = otherPlayerFirst ? getOtherPlayer() : getPlayer();
 	}
 
 	public void stopGame() {

@@ -10,12 +10,10 @@ import java.util.HashSet;
 import java.util.Set;
 
 import javax.imageio.ImageIO;
-import javax.inject.Inject;
 import javax.swing.JPanel;
 
 public class ClickBox extends JPanel {
 
-	@Inject
 	private Game game;
 
 	private byte x;
@@ -35,6 +33,7 @@ public class ClickBox extends JPanel {
 	public ClickBox(byte x, byte y, final View view) {
 		this.x = x;
 		this.y = y;
+		game = view.getGame();
         addMouseListener(new MouseAdapter() {
 
             @Override
@@ -44,7 +43,7 @@ public class ClickBox extends JPanel {
             	}
 
             	Position pos = Position.getPosition(ClickBox.this.x, ClickBox.this.y);
-            	game.makeMove(pos);
+            	game.makeMoveRequestFromUI(pos);
             }
         });
 

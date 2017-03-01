@@ -42,7 +42,16 @@ public class Timer {
 
 				--timeLeft;
 			}
-			game.notifyTimerTick(timeLeft);
+
+			try {
+				game.notifyTimerTick(timeLeft);
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
 		}
+	}
+
+	public int getTimeLeft() {
+		return timeLeft;
 	}
 }

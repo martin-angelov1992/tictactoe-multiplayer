@@ -3,6 +3,7 @@ package martin.tictactoe_multiplayer;
 import javax.inject.Inject;
 
 import martin.tictactoe_multiplayer.Commands.StartNewGame;
+import martin.tictactoe_multiplayer.Player.Symbol;
 import martin.tictactoe_multiplayer.communication.Communication;
 
 public class Game {
@@ -19,18 +20,43 @@ public class Game {
 
 	private StartNewGame pendingRequest;
 
-	public Game() {
-	}
+	private void makeMoveRequestCommon(Position pos) {
+		Player playerTurn = board.getPlayerTurn();
+		if (!board.tryMakeMove(playerTurn, pos)) {
+			return;
+		}
 
-	public void makeMove(Position pos) {
-		board.tryMakeMove(board.getPlayerTurn(), pos);
-		view.makeMove(pos, board.getPlayerTurn());
+		view.makeMove(pos, playerTurn);
 
 		Player winner = board.getWinner();
 
-		if (winner != null) {
-			view.gotWinner(winner.getName());
+		if (winner == null) {
+			timer.reset();
+			if (board.getPlayerTurn().isMe()) {
+				view.setMyTurn();
+			} else {
+				view.setOtherPlayerTurn();
+			}
+		} else {
+			timer.stop();
+			view.gotWinner(winner);
+			return;
 		}
+
+		if (!board.hasMoreMoves()) {
+			timer.stop();
+			view.notifyDraw();
+		}
+	}
+
+	public void makeMoveRequestFromUI(Position pos) {
+		makeMoveRequestCommon(pos);
+
+		communication.sendMove(pos.getX(), pos.getY());
+	}
+
+	public void makeMoveRequestFromOtherPlayer(Position pos) {
+		makeMoveRequestCommon(pos);
 	}
 
 	public void notifyTimesUp() {
@@ -43,7 +69,7 @@ public class Game {
 
 		Player winner = playerTurn.equals(me) ? otherPlayer : me;
 
-		view.gotWinner(winner.getName());
+		view.gotWinner(winner);
 	}
 
 	public void startNewGame(boolean imFirst) {
@@ -51,9 +77,18 @@ public class Game {
 			timer.stop();
 		}
 
+		board.startNewGame(imFirst);
+
+		Player firstPlayer = imFirst ? board.getPlayer() : board.getOtherPlayer();
+		Player secondPlayer = imFirst ? board.getOtherPlayer() : board.getPlayer();
+
+		firstPlayer.setSymbol(Symbol.X);
+		secondPlayer.setSymbol(Symbol.O);
+
 		timer = new Timer(this);
 		timer.run();
-		view.startNewGame(imFirst);
+		view.startNewGame(board.getPlayer(), imFirst);
+		view.setTimeLeft(timer.getTimeLeft(), !isMyTurn());
 	}
 
 	public void notifyTimerTick(int timeLeft) {
@@ -63,7 +98,7 @@ public class Game {
 			view.notifyTimeOver(!isMyTurn());
 
 			Player winner = board.getPlayerTurn().equals(board.getPlayer()) ? board.getOtherPlayer() : board.getPlayer();
-			view.gotWinner(winner.getName());
+			view.gotWinner(winner);
 			timer.stop();
 		}
 	}
@@ -89,11 +124,15 @@ public class Game {
 	}
 
 	public boolean isMyTurn() {
+		if (board.isGameOver()) {
+			return false;
+		}
+		
 		return board.getPlayer().equals(board.getPlayerTurn());
 	}
 
 	public void receiveNewGameRequestFromOtherPlayer(StartNewGame request) {
-		pendingRequest = request;
+		pendingRequest = StartNewGame.newBuilder().setImFirst(!request.getImFirst()).build();
 		view.receiveStartNewGameRequestFromOtherPlayer(!request.getImFirst());
 	}
 
@@ -104,15 +143,16 @@ public class Game {
 
 	public void receiveNewGameResponseFromUI(boolean agree) {
 		if (agree) {
-			startNewGame(!pendingRequest.getImFirst());
+			startNewGame(pendingRequest.getImFirst());
 		}
 
 		pendingRequest = null;
+		communication.sendStartNewGameResponse(agree);
 	}
 
 	public void receiveNewGameResponseFromOtherPlayer(boolean agree) {
 		if (agree) {
-			startNewGame(!pendingRequest.getImFirst());
+			startNewGame(pendingRequest.getImFirst());
 		}
 
 		pendingRequest = null;
@@ -127,5 +167,19 @@ public class Game {
 		int port = view.retrievePort();
 		communication.awaitConnection(port);
 		view.show();
+	}
+
+	public void notifyDisconnected() {
+		view.notifyDisconnected();
+
+		if (timer != null) {
+			timer.stop();
+		}
+
+		stopGame();
+	}
+
+	private void stopGame() {
+		board.stopGame();
 	}
 }
