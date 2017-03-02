@@ -34,6 +34,12 @@ public class Communication {
 	private volatile Channel channel;
 
 	void setChannel(Channel channel) {
+		channel.closeFuture().addListener(new ChannelFutureListener() {
+	        @Override
+	        public void operationComplete(ChannelFuture future) throws Exception {
+	           game.notifyDisconnected();
+	        }
+	    });
 		this.channel = channel;
 	}
 
@@ -48,12 +54,7 @@ public class Communication {
 		// Bind to port
 		try {
 			isHost = true;
-			bootStrap.bind(port).sync().channel().closeFuture().addListener(new ChannelFutureListener() {
-		        @Override
-		        public void operationComplete(ChannelFuture future) throws Exception {
-		           game.notifyDisconnected();
-		        }
-		    });
+			bootStrap.bind(port).sync().channel();
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}
@@ -77,12 +78,6 @@ public class Communication {
 
 		// Create connection
 		channel = future.channel();
-		channel.closeFuture().addListener(new ChannelFutureListener() {
-	        @Override
-	        public void operationComplete(ChannelFuture future) throws Exception {
-	           game.notifyDisconnected();
-	        }
-	    });
 		return true;
 	}
 
