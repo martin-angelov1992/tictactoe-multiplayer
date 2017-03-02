@@ -4,7 +4,6 @@ import java.awt.Graphics;
 import java.awt.Image;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.io.File;
 import java.io.IOException;
 import java.util.HashSet;
 import java.util.Set;
@@ -53,7 +52,7 @@ public class ClickBox extends JPanel {
 
 	public void putBackground(String fileName) {
 		try {
-			Image backgroundImage = ImageIO.read(new File(fileName));
+			Image backgroundImage = ImageIO.read(this.getClass().getClassLoader().getResource(fileName));
 			Graphics g = this.getGraphics();
 			g.drawImage(backgroundImage, 0, 0, this);
 		} catch (IOException e) {
