@@ -39,6 +39,7 @@ public class ClickBox extends JPanel {
             @Override
             public void mouseClicked(MouseEvent e) {
             	if (!game.isMyTurn()) {
+            		System.out.println("It's not your turn.");
             		return;
             	}
 

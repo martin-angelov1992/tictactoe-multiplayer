@@ -149,6 +149,7 @@ public class Board {
 	}
 
 	public void startNewGame(boolean otherPlayerFirst) {
+		reset();
 		gameOver = false;
 		gameStarted = true;
 		playerTurn = otherPlayerFirst ? getOtherPlayer() : getPlayer();

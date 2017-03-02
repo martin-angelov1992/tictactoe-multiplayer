@@ -23,6 +23,7 @@ public class Game {
 	private void makeMoveRequestCommon(Position pos) {
 		Player playerTurn = board.getPlayerTurn();
 		if (!board.tryMakeMove(playerTurn, pos)) {
+			System.out.println("Unable to make move.");
 			return;
 		}
 
@@ -73,11 +74,13 @@ public class Game {
 	}
 
 	public void startNewGame(boolean imFirst) {
+		System.out.println("Starting new game." + (imFirst ? " I'm first." : ""));
+
 		if (timer != null) {
 			timer.stop();
 		}
 
-		board.startNewGame(imFirst);
+		board.startNewGame(!imFirst);
 
 		Player firstPlayer = imFirst ? board.getPlayer() : board.getOtherPlayer();
 		Player secondPlayer = imFirst ? board.getOtherPlayer() : board.getPlayer();
@@ -132,6 +135,7 @@ public class Game {
 	}
 
 	public void receiveNewGameRequestFromOtherPlayer(StartNewGame request) {
+		System.out.println("Setting pending request."+(!request.getImFirst() ? " I'm first." : ""));
 		pendingRequest = StartNewGame.newBuilder().setImFirst(!request.getImFirst()).build();
 		view.receiveStartNewGameRequestFromOtherPlayer(!request.getImFirst());
 	}

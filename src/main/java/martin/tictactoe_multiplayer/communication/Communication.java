@@ -38,6 +38,7 @@ public class Communication {
 	        @Override
 	        public void operationComplete(ChannelFuture future) throws Exception {
 	           game.notifyDisconnected();
+	           isHost = true;
 	        }
 	    });
 		this.channel = channel;
