@@ -1,0 +1,13 @@
+Manifest-Version: 1.0
+Built-By: Martin_Angelov
+Class-Path: dependency-jars/netty-all-4.0.20.Final.jar dependency-jars
+ /netty-handler-4.0.20.Final.jar dependency-jars/netty-buffer-4.0.20.F
+ inal.jar dependency-jars/netty-common-4.0.20.Final.jar dependency-jar
+ s/netty-transport-4.0.20.Final.jar dependency-jars/netty-codec-4.0.20
+ .Final.jar dependency-jars/protobuf-java-3.2.0.jar dependency-jars/gu
+ ice-4.0.jar dependency-jars/javax.inject-1.jar dependency-jars/aopall
+ iance-1.0.jar dependency-jars/guava-16.0.1.jar
+Build-Jdk: 1.8.0_77
+Created-By: Maven Integration for Eclipse
+Main-Class: martin.tictactoe_multiplayer.Main
+
